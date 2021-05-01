@@ -3,7 +3,6 @@ from flask import current_app as app
 from app import db
 from app.data.models import Role, User
 from app.utils import api_response
-from app.data.permissions import permissions
 import json
 import re
 

@@ -1,5 +1,7 @@
 flask-login
 flask-sqlalchemy
 flask-wtf
+google-api-python-client
+google-auth-oauthlib
 pip-chill
 python-dotenv
