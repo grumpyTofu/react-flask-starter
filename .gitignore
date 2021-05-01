@@ -28,4 +28,4 @@ client/yarn-error.log*
 # --- server ---
 server/env
 server/credentials
-**/*/__pycache__
+__pycache__/
