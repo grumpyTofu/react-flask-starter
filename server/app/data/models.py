@@ -58,9 +58,9 @@ class User(db.Model):
         }
 
 
-class UserRole(db.Model):
+class Role(db.Model):
 
-    __tablename__ = 'userRoles'
+    __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80))
     permission = db.Column(db.Integer)
@@ -70,7 +70,7 @@ class UserRole(db.Model):
         self.permission = permissions[permission]
 
     def __repr__(self):
-        return '<UserRole {}'.format(self.id)
+        return '<Role {}'.format(self.id)
 
     def serialize(self):
         return {
