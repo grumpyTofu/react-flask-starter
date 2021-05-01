@@ -46,7 +46,9 @@ def createRole():
 def updateRole(id: int):
     try:
         role = Role.query.get(id)
-
+        if not role:
+            raise Exception('Object does not exist')
+            
         body = request.get_json()
         if len(body.keys()) == 0:
             raise Exception('Update data not provided')

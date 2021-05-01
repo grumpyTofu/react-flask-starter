@@ -19,10 +19,12 @@ def init_app():
         # Include our Routes
         from app.api.todo import todo_bp
         from app.api.role import role_bp
+        from app.api.user import user_bp
 
         # Register Blueprints
         app.register_blueprint(todo_bp)
         app.register_blueprint(role_bp)
+        app.register_blueprint(user_bp)
 
         # Create Database Models
         db.create_all()

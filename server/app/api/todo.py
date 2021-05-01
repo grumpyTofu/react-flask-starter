@@ -44,28 +44,22 @@ def createTodo():
 @todo_bp.route('/updateTodo/<int:id>', methods=['PATCH'])
 def updateTodo(id: int):
     try:
-        todo = Todo.query.filter_by(id=id).first()
+        todo = Todo.query.get(id)
         if not todo:
             raise Exception('Object does not exist')
 
-        body = json.loads(request.data)
+        body = request.get_json()
+        if len(body.keys()) == 0:
+            raise Exception('Update data not provided')
 
-        if 'title' not in body.keys():
-            raise Exception('Required properties not specified')
-        title = body['title']
+        if 'title' in body.keys() and getattr(todo, 'title') != body['title']:
+            setattr(todo, 'title', body['title'])
+        
+        if 'description' in body.keys() and getattr(todo, 'description') != body['description']:
+            setattr(todo, 'description', body['description'])
 
-        if 'description' not in body.keys():
-            raise Exception('Required properties not specified')
-        description = body['description']
-
-        uid = body['uid'] if 'uid' in body.keys() else None
-
-        if title != todo.title:
-            todo.title = title
-        if description != todo.description:
-            todo.description = description
-        if uid != todo.uid:
-            todo.uid = uid
+        if 'uid' in body.keys() and getattr(todo, 'uid') != body['uid']:
+            setattr(todo, 'uid', body['uid'])
         
         db.session.commit()
         

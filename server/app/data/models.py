@@ -36,7 +36,7 @@ class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(80), index=True, unique=True)
-    role_id = db.Column(db.Integer, db.ForeignKey('userRoles.id'))
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     last_login = db.Column(db.DateTime, nullable=True)
     todos = db.relationship('Todo', backref='todos', lazy=True)
@@ -54,7 +54,8 @@ class User(db.Model):
             'email': self.email,
             'role_id': self.role_id,
             'created_at': self.created_at,
-            'last_login': self.last_login
+            'last_login': self.last_login,
+            'todos': [todo.serialize() for todo in self.todos]
         }
 
 
