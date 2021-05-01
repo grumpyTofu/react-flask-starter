@@ -26,5 +26,5 @@ client/yarn-error.log*
 */**/.env.production.local
 
 # --- server ---
-
 server/env
+server/credentials
