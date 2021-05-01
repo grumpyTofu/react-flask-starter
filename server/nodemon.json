@@ -1,0 +1,7 @@
+{
+  "verbose": true,
+  "ignore": ["requirements.txt", "app/data/*.db", "env/"],
+  "execMap": {
+    "py": "python"
+  }
+}

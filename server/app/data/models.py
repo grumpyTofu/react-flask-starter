@@ -1,5 +1,6 @@
 from app import db
-import enum
+from app.data.permissions import permissions, reverse_lookup
+import datetime
 
 class Todo(db.Model):
 
@@ -7,16 +8,17 @@ class Todo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(80))
     description = db.Column(db.Text)
-    created_at = db.Column(db.Datetime)
-    updated_at = db.Column(db.Datetime)
-    updated_by_id = db.Column(db.Integer, db.Foreignkey('users.id'))
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    uid = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
 
-    def __init__(self, email, role_id):
-        self.email = email
-        self.role_id = role_id
+    def __init__(self, title, description, uid=None):
+        self.title = title
+        self.description = description
+        self.uid = uid
 
     def __repr__(self):
-        return '<User {}>'.format(self.username)
+        return '<User {}>'.format(self.id)
 
     def serialize(self):
         return {
@@ -25,7 +27,7 @@ class Todo(db.Model):
             'description': self.description,
             'created_at': self.created_at,
             'updated_at': self.updated_at,
-            'updated_by_id': self.updated_by_id
+            'uid': self.uid
         }
 
 
@@ -33,17 +35,18 @@ class User(db.Model):
 
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(80), index=True, unique=True, nullable=False)
-    role_id = db.Column(db.Integer, db.ForeignKey('userRoles.id'), nullable=False)
-    created_at = db.Column(db.DateTime, index=False, unique=False, nullable=False)
-    last_login = db.Column(db.DateTime, index=False, unique=False, nullable=True)
+    email = db.Column(db.String(80), index=True, unique=True)
+    role_id = db.Column(db.Integer, db.ForeignKey('userRoles.id'))
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    last_login = db.Column(db.DateTime, nullable=True)
+    todos = db.relationship('Todo', backref='todos', lazy=True)
 
     def __init__(self, email, role_id):
         self.email = email
         self.role_id = role_id
 
     def __repr__(self):
-        return '<User {}>'.format(self.username)
+        return '<User {}>'.format(self.id)
 
     def serialize(self):
         return {
@@ -55,22 +58,16 @@ class User(db.Model):
         }
 
 
-class Permissions(enum.Enum):
-    user = 1
-    super_user = 2
-    admin = 3
-
-
 class UserRole(db.Model):
 
     __tablename__ = 'userRoles'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80))
-    permission = db.Column(db.Enum(Permissions))
+    permission = db.Column(db.Integer)
 
     def __init__(self, name, permission):
         self.name = name
-        self.permission = permission
+        self.permission = permissions[permission]
 
     def __repr__(self):
         return '<UserRole {}'.format(self.id)
@@ -79,5 +76,5 @@ class UserRole(db.Model):
         return {
             'id': self.id,
             'name': self.name,
-            'permission': self.permission
+            'permission': reverse_lookup(self.permission)
         }
