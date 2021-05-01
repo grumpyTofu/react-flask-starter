@@ -41,10 +41,13 @@ def createTodo():
     except Exception as error:
         return api_response(True, 'Failed to create todo', str(error))
 
-@todo_bp.route('/updateTodo/<int:id>', methods=['PUT'])
+@todo_bp.route('/updateTodo/<int:id>', methods=['PATCH'])
 def updateTodo(id: int):
     try:
         todo = Todo.query.filter_by(id=id).first()
+        if not todo:
+            raise Exception('Object does not exist')
+
         body = json.loads(request.data)
 
         if 'title' not in body.keys():
@@ -74,6 +77,9 @@ def updateTodo(id: int):
 def deleteTodo(id: int):
     try:
         todo = Todo.query.filter_by(id=id).first()
+        if not todo:
+            raise Exception('Object does not exist')
+            
         db.session.delete(todo)
         db.session.commit()
         return api_response(False, 'Successfully deleted todo')
