@@ -1,6 +1,6 @@
 from flask import Blueprint, request, redirect, url_for
 from flask import current_app as app
-from flask_login import login_required, login_user
+from flask_login import login_required, login_user, logout_user
 from app import db
 import requests
 from app.data.models import User
@@ -77,4 +77,10 @@ def callback():
 @auth_bp.route('/auth/success')
 @login_required
 def loginTest():
-    return 'Successfully logged in. You may now close the browser.'
+    return 'Successfully authenticated. You may now close the browser.'
+
+@auth_bp.route("/deauth")
+@login_required
+def deauth():
+    logout_user()
+    return "Successfully Deauthenticated. You may now close the browser."
