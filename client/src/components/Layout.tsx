@@ -22,6 +22,8 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MailIcon from '@material-ui/icons/Mail';
+import { Avatar } from '@material-ui/core';
+import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 
 const drawerWidth = 240;
 
@@ -55,10 +57,24 @@ const useStyles = makeStyles((theme: Theme) =>
       width: drawerWidth,
       flexShrink: 0,
       whiteSpace: 'nowrap',
+      '& .MuiListItem-root': {
+        justifyContent: 'center',
+      },
+      '& .MuiListItemIcon-root': {
+        width: theme.spacing(7) + 1,
+        [theme.breakpoints.up('sm')]: {
+          width: theme.spacing(9) + 1,
+        },
+        justifyContent: 'center',
+      },
+      '& .MuiListItem-gutters': {
+        paddingRight: 0,
+        paddingLeft: 0,
+      },
     },
     drawerOverride: {
-        backgroundColor: theme.palette.primary.main,
-        color: theme.palette.common.white
+      backgroundColor: theme.palette.primary.main,
+      color: theme.palette.common.white,
     },
     drawerOpen: {
       width: drawerWidth,
@@ -96,10 +112,18 @@ const useStyles = makeStyles((theme: Theme) =>
       left: 0,
       right: 0,
     },
+    alignLeft: {
+      display: 'flex',
+      justifyContent: 'flex-start !important',
+    },
     alignRight: {
-        display: 'flex',
-        justifyContent: 'flex-end'
-    }
+      display: 'flex',
+      justifyContent: 'flex-end !important',
+    },
+    avatar: {
+      height: theme.spacing(4),
+      width: theme.spacing(4),
+    },
   })
 );
 
@@ -139,25 +163,17 @@ const Layout: React.FC = ({ children }) => {
           [classes.drawerClose]: !open,
         })}
         classes={{
-          paper: clsx({
-            [classes.drawerOpen]: open,
-            [classes.drawerClose]: !open
-          }, classes.drawerOverride),
+          paper: clsx(
+            {
+              [classes.drawerOpen]: open,
+              [classes.drawerClose]: !open,
+            },
+            classes.drawerOverride
+          ),
         }}
       >
-        <div className={classes.toolbar}></div>
-        <Divider />
-        <List>
-          {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItem>
-          ))}
-        </List>
-        <Divider />
+        {/* <div className={classes.toolbar}></div>
+        <Divider /> */}
         <List>
           {['All mail', 'Trash', 'Spam'].map((text, index) => (
             <ListItem button key={text}>
@@ -167,19 +183,31 @@ const Layout: React.FC = ({ children }) => {
               <ListItemText primary={text} />
             </ListItem>
           ))}
+          <ListItem button>
+                <ListItemIcon>
+                    <AccountCircleIcon />
+                </ListItemIcon>
+                <ListItemText primary="Profile" />
+            </ListItem>
         </List>
         <div className={classes.appControls}>
           <Divider />
           <List>
+            <ListItem button>
+              <ListItemIcon>
+                <Avatar className={classes.avatar}>J</Avatar>
+              </ListItemIcon>
+              <ListItemText primary="John Smith" />
+            </ListItem>
             <ListItem
               button
               onClick={open ? handleDrawerClose : handleDrawerOpen}
               className={clsx({
-                  [classes.alignRight]: open
+                [classes.alignRight]: open,
               })}
             >
               {open ? (
-                <ListItemIcon className={classes.alignRight}>
+                <ListItemIcon>
                   {theme.direction === 'rtl' ? (
                     <ChevronRightIcon />
                   ) : (

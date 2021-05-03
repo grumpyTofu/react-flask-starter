@@ -12,6 +12,11 @@ export const theme = createMuiTheme({
       root: {
         color: '#FFF !important'
       }
+    },
+    MuiDivider: {
+      root: {
+        backgroundColor: '#BDBDBD'
+      }
     }
   }
 });
