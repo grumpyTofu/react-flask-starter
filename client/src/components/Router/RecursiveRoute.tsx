@@ -7,16 +7,15 @@ interface RouteConfigProps {
 }
 
 const RecursiveRoute: React.FC<RouteConfigProps> = ({
-  routeConfig: { component, path, routes },
+  routeConfig: { component, path },
 }) => {
-  console.log(routes);
   return (
     <>
       <Route path={path} element={component} />
-      {routes &&
+      {/* {routes &&
         routes.map((route: any) => (
           <RecursiveRoute routeConfig={route} key={`RecursiveRoute_${path}`} />
-        ))}
+        ))} */}
     </>
   );
 };

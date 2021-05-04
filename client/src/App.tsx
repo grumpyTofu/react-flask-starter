@@ -4,43 +4,32 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Outlet,
-  useOutlet,
 } from 'react-router-dom';
 import { Counter } from './components/counter/Counter';
-import RecursiveRoute from './components/Router/RecursiveRoute';
 import NotFound from './components/Router/NotFound';
+import DashboardIcon from '@material-ui/icons/Dashboard';
+import ListIcon from '@material-ui/icons/List';
 
 export interface RouteConfig {
   path: string;
   component: any;
-  routes?: RouteConfig[];
+  icon: any;
+  title: string;
+  // routes?: RouteConfig[];
 }
 
-const routeConfig: RouteConfig[] = [
+export const routes: RouteConfig[] = [
   {
     path: '/',
     component: <Counter />,
+    icon: <DashboardIcon />,
+    title: 'Dashboard'
   },
   {
-    path: '/invoices',
-    component: <div>Invoices</div>,
-  },
-  {
-    path: '/dashboard',
-    component: <div>Dashboard</div>,
-  },
-  {
-    path: '/test',
-    component: <div>Test</div>,
-  },
-  {
-    path: '/test/recursive',
-    component: <div>Recursive</div>,
-  },
-  {
-    path: '/test/recursive/routes',
-    component: <div>Recursive Route</div>,
+    path: '/todos',
+    component: <div>Todos</div>,
+    icon: <ListIcon />,
+    title: 'Todos'
   },
 ];
 
@@ -49,11 +38,11 @@ const App: React.FC = () => {
     <Router>
       <Routes>
         <Route path="/" element={<Layout />}>
-          {routeConfig.map(route => (
+          {routes.map(route => (
             <Route
               path={route.path}
               element={route.component}
-              key={`RecursiveRoute_${route.path}`}
+              key={`Route_${route.path}`}
             />
           ))}
           <Route path="*" element={<NotFound />} />

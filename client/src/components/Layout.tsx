@@ -1,5 +1,5 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, Link } from 'react-router-dom';
 import clsx from 'clsx';
 import {
   createStyles,
@@ -25,6 +25,7 @@ import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MailIcon from '@material-ui/icons/Mail';
 import { Avatar } from '@material-ui/core';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import { routes } from '../App';
 
 const drawerWidth = 240;
 
@@ -176,20 +177,12 @@ const Layout: React.FC = ({ children }) => {
         {/* <div className={classes.toolbar}></div>
         <Divider /> */}
         <List>
-          {['All mail', 'Trash', 'Spam'].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
+          {routes.map(route => (
+            <ListItem button component={Link} to={route.path}>
+              <ListItemIcon>{route.icon}</ListItemIcon>
+              <ListItemText primary={route.title} />
             </ListItem>
           ))}
-          <ListItem button>
-            <ListItemIcon>
-              <AccountCircleIcon />
-            </ListItemIcon>
-            <ListItemText primary="Profile" />
-          </ListItem>
         </List>
         <div className={classes.appControls}>
           <Divider />
