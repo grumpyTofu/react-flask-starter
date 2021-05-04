@@ -21,12 +21,12 @@ export const theme = createMuiTheme({
   }
 });
 
-// export const GlobalCss = withStyles({
-//     // @global is handled by jss-plugin-global.
-//     '@global': {
-//       // You should target [class*="MuiButton-root"] instead if you nest themes.
-//       'div.MuiDrawer-paper > div.MuiListItemIcon-root': {
-//         color: 'white',
-//       },
-//     },
-//   })(() => null);
+export const GlobalCss = withStyles({
+    // @global is handled by jss-plugin-global.
+    '@global': {
+      // You should target [class*="MuiButton-root"] instead if you nest themes.
+      'body': {
+        backgroundColor: '#F5F6FA'
+      }
+    },
+  })(() => null);
