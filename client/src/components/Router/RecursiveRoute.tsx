@@ -2,13 +2,21 @@ import React from 'react';
 import { Route } from 'react-router-dom';
 import { RouteConfig } from '../../App';
 
-const RecursiveRoute: React.FC<{ routeConfig: RouteConfig }> = ({
+interface RouteConfigProps {
+  routeConfig: RouteConfig;
+}
+
+const RecursiveRoute: React.FC<RouteConfigProps> = ({
   routeConfig: { component, path, routes },
 }) => {
+  console.log(routes);
   return (
     <>
-      <Route exact path={path} component={component} key={`Route_${path}`} />
-      {routes && routes.map(route => <RecursiveRoute routeConfig={route} />)}
+      <Route path={path} element={component} />
+      {routes &&
+        routes.map((route: any) => (
+          <RecursiveRoute routeConfig={route} key={`RecursiveRoute_${path}`} />
+        ))}
     </>
   );
 };

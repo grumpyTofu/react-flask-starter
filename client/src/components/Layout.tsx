@@ -1,4 +1,5 @@
 import React from 'react';
+import { Outlet } from 'react-router-dom';
 import clsx from 'clsx';
 import {
   createStyles,
@@ -184,11 +185,11 @@ const Layout: React.FC = ({ children }) => {
             </ListItem>
           ))}
           <ListItem button>
-                <ListItemIcon>
-                    <AccountCircleIcon />
-                </ListItemIcon>
-                <ListItemText primary="Profile" />
-            </ListItem>
+            <ListItemIcon>
+              <AccountCircleIcon />
+            </ListItemIcon>
+            <ListItemText primary="Profile" />
+          </ListItem>
         </List>
         <div className={classes.appControls}>
           <Divider />
@@ -225,7 +226,8 @@ const Layout: React.FC = ({ children }) => {
       </Drawer>
       <main className={classes.content}>
         <div className={classes.toolbar} />
-        {children}
+        <Outlet />
+        {/* {children} */}
       </main>
     </div>
   );
