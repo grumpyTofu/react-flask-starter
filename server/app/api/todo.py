@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request
 from flask import current_app as app
 from app import db
 from app.data.models import Todo
-from app.utils import api_response
+from app.utils import api_response, get_fields
 import json
 
 # Blueprint Configuration
@@ -11,9 +11,10 @@ todo_bp = Blueprint('todo', __name__)
 @todo_bp.route('/getTodos')
 def getTodos():
     try:
+        fields = get_fields(request)
         uid = request.args['uid'] if len(request.args) > 0 and 'uid' in request.args else None
         todos = Todo.query.filter_by(uid=uid).all()
-        return api_response(False, 'Todos successfully retrieved', [todo.serialize() for todo in todos])
+        return api_response(False, 'Todos successfully retrieved', [todo.serialize(fields) for todo in todos])
     except Exception as error:
         return api_response(True, 'Failed to get todos', str(error))
 
@@ -21,7 +22,8 @@ def getTodos():
 @todo_bp.route('/createTodo', methods=['POST'])
 def createTodo():
     try:
-        body = json.loads(request.data)
+        fields = get_fields(request, request.method)
+        body = request.get_json()
 
         if 'title' not in body.keys():
             raise Exception('Required properties not specified')
@@ -37,13 +39,14 @@ def createTodo():
         db.session.add(todo)
         db.session.commit()
 
-        return api_response(False, 'Todo created successfully', todo.serialize())
+        return api_response(False, 'Todo created successfully', todo.serialize(fields))
     except Exception as error:
         return api_response(True, 'Failed to create todo', str(error))
 
 @todo_bp.route('/updateTodo/<int:id>', methods=['PATCH'])
 def updateTodo(id: int):
     try:
+        fields = get_fields(request, request.method)
         todo = Todo.query.get(id)
         if not todo:
             raise Exception('Object does not exist')
@@ -63,7 +66,7 @@ def updateTodo(id: int):
         
         db.session.commit()
         
-        return api_response(False, 'Successfully updated todo', todo.serialize())
+        return api_response(False, 'Successfully updated todo', todo.serialize(fields))
     except Exception as error:
         return api_response(True, 'Failed to update todo', str(error))
 

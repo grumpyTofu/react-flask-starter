@@ -1,4 +1,5 @@
-from os import environ, path
+from os import environ, path, urandom
+import datetime
 from dotenv import load_dotenv
 
 basedir = path.abspath(path.dirname(__file__))
@@ -14,7 +15,9 @@ class Config:
     GOOGLE_DISCOVERY_URL = (
         "https://accounts.google.com/.well-known/openid-configuration"
     )
-    SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly']
+    SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly'],
+    SECRET_KEY = urandom(32)
+    JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(hours=1)
 
 
 class ProdConfig(Config):

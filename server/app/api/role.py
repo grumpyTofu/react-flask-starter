@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request
 from flask import current_app as app
 from app import db
 from app.data.models import Role
-from app.utils import api_response
+from app.utils import api_response, get_fields
 from app.data.permissions import permissions
 import json
 
@@ -12,8 +12,9 @@ role_bp = Blueprint('role', __name__)
 @role_bp.route('/getRoles')
 def getRoles():
     try:
+        fields = get_fields(request)
         roles = Role.query.all()
-        return api_response(False, 'Roles successfully retrieved', [role.serialize() for role in roles])
+        return api_response(False, 'Roles successfully retrieved', [role.serialize(fields) for role in roles])
     except Exception as error:
         return api_response(True, 'Failed to get roles', str(error))
 
@@ -21,6 +22,7 @@ def getRoles():
 @role_bp.route('/createRole', methods=['POST'])
 def createRole():
     try:
+        fields = get_fields(request, request.method)
         body = json.loads(request.data)
 
         if 'name' not in body.keys():
@@ -38,13 +40,14 @@ def createRole():
         db.session.add(role)
         db.session.commit()
 
-        return api_response(False, 'Role created successfully', role.serialize())
+        return api_response(False, 'Role created successfully', role.serialize(fields))
     except Exception as error:
         return api_response(True, 'Failed to create role', str(error))
 
 @role_bp.route('/updateRole/<int:id>', methods=['PATCH'])
 def updateRole(id: int):
     try:
+        fields = get_fields(request, request.method)
         role = Role.query.get(id)
         if not role:
             raise Exception('Object does not exist')
@@ -63,7 +66,7 @@ def updateRole(id: int):
             setattr(role, 'permission', permissions[new_permission])
 
         db.session.commit()
-        return api_response(False, 'Successfully updated role', role.serialize())
+        return api_response(False, 'Successfully updated role', role.serialize(fields))
     except Exception as error:
         return api_response(True, 'Failed to update Role', str(error))
 
