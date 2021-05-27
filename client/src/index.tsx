@@ -6,7 +6,6 @@ import { Provider } from 'react-redux';
 import * as serviceWorker from './serviceWorker';
 import { GlobalCss, theme } from './theme';
 import { ThemeProvider } from '@material-ui/core/styles';
-import { BrowserRouter as Router } from 'react-router-dom';
 import './index.css';
 
 ReactDOM.render(

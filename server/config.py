@@ -16,9 +16,8 @@ class Config:
         "https://accounts.google.com/.well-known/openid-configuration"
     )
     SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly'],
-    SECRET_KEY = urandom(32)
+    SECRET_KEY = '67681706705814926988217450263467825103115742778348395787050591504601043143932'
     JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(hours=1)
-
 
 class ProdConfig(Config):
     FLASK_ENV = 'production'

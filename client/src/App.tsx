@@ -1,54 +1,44 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from './components/Layout';
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-} from 'react-router-dom';
-import { Counter } from './components/counter/Counter';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Profile from './pages/Profile';
 import NotFound from './components/Router/NotFound';
-import DashboardIcon from '@material-ui/icons/Dashboard';
-import ListIcon from '@material-ui/icons/List';
-
-export interface RouteConfig {
-  path: string;
-  component: any;
-  icon: any;
-  title: string;
-  // routes?: RouteConfig[];
-}
-
-export const routes: RouteConfig[] = [
-  {
-    path: '/',
-    component: <Counter />,
-    icon: <DashboardIcon />,
-    title: 'Dashboard'
-  },
-  {
-    path: '/todos',
-    component: <div>Todos</div>,
-    icon: <ListIcon />,
-    title: 'Todos'
-  },
-];
+import { routes } from './components/Router/Config';
+import Login from './pages/Login';
+import { useAppSelector } from './app/hooks';
+import { selectLoggedIn } from './pages/Login/loginSlice';
 
 const App: React.FC = () => {
+
+  const loggedIn = useAppSelector(selectLoggedIn);
+
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          {routes.map(route => (
-            <Route
-              path={route.path}
-              element={route.component}
-              key={`Route_${route.path}`}
-            />
-          ))}
-          <Route path="*" element={<NotFound />} />
-        </Route>
-      </Routes>
-    </Router>
+    <>
+      {!loggedIn ? (
+        <Router>
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="*" element={<Navigate to="/" replace={true} />} />
+          </Routes>
+        </Router>
+      ) : (
+        <Router>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              {routes.map(route => (
+                <Route
+                  path={route.path}
+                  element={route.component}
+                  key={`Route_${route.path}`}
+                />
+              ))}
+              <Route path="profile" element={<Profile />} />
+              <Route path="*" element={<NotFound />} />
+            </Route>
+          </Routes>
+        </Router>
+      )}
+    </>
   );
 };
 

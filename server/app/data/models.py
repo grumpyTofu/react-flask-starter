@@ -14,8 +14,9 @@ class Todo(db.Model, SerializerMixin):
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
     uid = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    user = db.relationship('User', backref='user', uselist=False, lazy=True, viewonly=True)
 
-    default_fields = ['id', 'title', 'description', 'created_at', 'updated_at', 'uid']
+    default_fields = ['id', 'title', 'description', 'created_at', 'updated_at']
 
     def serialize(self, fields=None):
         return self.to_dict(only=fields if fields else self.default_fields)
@@ -37,7 +38,7 @@ class User(db.Model, SerializerMixin):
     email = db.Column(db.String(80), index=True, unique=True)
     gid = db.Column(db.String(80), nullable=True)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
-    role = db.relationship('Role', backref='role', uselist=False, lazy=True)
+    role = db.relationship('Role', backref='role', uselist=False, lazy=True, viewonly=True)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     last_login = db.Column(db.DateTime, nullable=True)
     todos = db.relationship('Todo', backref='todos', lazy=True)

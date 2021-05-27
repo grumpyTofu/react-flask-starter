@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Outlet, Link } from 'react-router-dom';
 import clsx from 'clsx';
 import {
@@ -7,25 +7,21 @@ import {
   useTheme,
   Theme,
 } from '@material-ui/core/styles';
-import Drawer from '@material-ui/core/Drawer';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import List from '@material-ui/core/List';
+import {
+  Container,
+  Drawer,
+  List,
+  Divider,
+  IconButton,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+} from '@material-ui/core';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import Typography from '@material-ui/core/Typography';
-import Divider from '@material-ui/core/Divider';
-import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import MailIcon from '@material-ui/icons/Mail';
 import { Avatar } from '@material-ui/core';
-import AccountCircleIcon from '@material-ui/icons/AccountCircle';
-import { routes } from '../App';
+import { routes } from './Router/Config';
 
 const drawerWidth = 240;
 
@@ -99,7 +95,7 @@ const useStyles = makeStyles((theme: Theme) =>
     toolbar: {
       display: 'flex',
       alignItems: 'center',
-      justifyContent: 'flex-end',
+      justifyContent: 'center',
       padding: theme.spacing(0, 1),
       // necessary for content to be below app bar
       ...theme.mixins.toolbar,
@@ -108,7 +104,7 @@ const useStyles = makeStyles((theme: Theme) =>
       flexGrow: 1,
       padding: theme.spacing(3),
     },
-    appControls: {
+    sidebarControl: {
       position: 'absolute',
       bottom: 0,
       left: 0,
@@ -132,7 +128,7 @@ const useStyles = makeStyles((theme: Theme) =>
 const Layout: React.FC = ({ children }) => {
   const classes = useStyles();
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState<boolean>(false);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -174,8 +170,12 @@ const Layout: React.FC = ({ children }) => {
           ),
         }}
       >
-        {/* <div className={classes.toolbar}></div>
-        <Divider /> */}
+        <div className={classes.toolbar}>
+          <IconButton component={Link} to="profile">
+            <Avatar className={classes.avatar}>A</Avatar>
+          </IconButton>
+        </div>
+        <Divider />
         <List>
           {routes.map(route => (
             <ListItem button component={Link} to={route.path}>
@@ -184,15 +184,8 @@ const Layout: React.FC = ({ children }) => {
             </ListItem>
           ))}
         </List>
-        <div className={classes.appControls}>
-          <Divider />
+        <div className={classes.sidebarControl}>
           <List>
-            <ListItem button>
-              <ListItemIcon>
-                <Avatar className={classes.avatar}>J</Avatar>
-              </ListItemIcon>
-              <ListItemText primary="John Smith" />
-            </ListItem>
             <ListItem
               button
               onClick={open ? handleDrawerClose : handleDrawerOpen}
@@ -210,7 +203,7 @@ const Layout: React.FC = ({ children }) => {
                 </ListItemIcon>
               ) : (
                 <ListItemIcon>
-                  <MenuIcon />
+                  <ChevronRightIcon />
                 </ListItemIcon>
               )}
             </ListItem>
@@ -219,8 +212,9 @@ const Layout: React.FC = ({ children }) => {
       </Drawer>
       <main className={classes.content}>
         <div className={classes.toolbar} />
-        <Outlet />
-        {/* {children} */}
+        <Container>
+          <Outlet />
+        </Container>
       </main>
     </div>
   );
