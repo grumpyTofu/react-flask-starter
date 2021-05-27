@@ -35,6 +35,8 @@ def auth():
         gid = credentials.id_token['sub']
         email = credentials.id_token['email']
         name = credentials.id_token['name']
+
+        print(credentials.id_token)
         
         user = User.query.filter_by(gid=gid).first()
         if not user:
@@ -43,11 +45,16 @@ def auth():
             db.session.commit()
 
         # Begin user session by logging the user in
-        access_token = create_access_token(name, additional_claims=user.serialize(['id', 'name', 'email', 'role_id', 'gid']), fresh=True)
-        refresh_token = create_refresh_token(name, additional_claims=user.serialize(['id', 'name', 'email', 'role_id', 'gid']))
+        additional_claims = ['id', 'role_id', 'gid']
+        access_token = create_access_token(name, additional_claims=user.serialize(additional_claims), fresh=True)
+        refresh_token = create_refresh_token(name, additional_claims=user.serialize(additional_claims))
         return api_response(False, "Authentication successful", {
             'access_token': access_token, 
-            'refresh_token': refresh_token
+            'refresh_token': refresh_token,
+            'user': {
+                'name': user.name,
+                'email': user.email
+            }
         })
     except Exception as error:
         return api_response(True, "Failed to authenticate", str(error))

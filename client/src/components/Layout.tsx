@@ -178,9 +178,9 @@ const Layout: React.FC = ({ children }) => {
         <Divider />
         <List>
           {routes.map(route => (
-            <ListItem button component={Link} to={route.path}>
-              <ListItemIcon>{route.icon}</ListItemIcon>
-              <ListItemText primary={route.title} />
+            <ListItem button component={Link} to={route.path} key={`ListItem_${route.path}`}>
+              <ListItemIcon key={`ListItemIcon_${route.path}`}>{route.icon}</ListItemIcon>
+              <ListItemText primary={route.title} key={`ListItemText_${route.path}`} />
             </ListItem>
           ))}
         </List>

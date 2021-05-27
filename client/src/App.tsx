@@ -6,7 +6,7 @@ import NotFound from './components/Router/NotFound';
 import { routes } from './components/Router/Config';
 import Login from './pages/Login';
 import { useAppSelector } from './app/hooks';
-import { selectLoggedIn } from './pages/Login/loginSlice';
+import { selectLoggedIn } from './pages/Login/authSlice';
 
 const App: React.FC = () => {
 

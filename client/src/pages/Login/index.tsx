@@ -10,14 +10,25 @@ import {
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import { useGoogleLogin } from 'react-google-login';
 import { useAppDispatch } from '../../app/hooks';
-import { login } from './loginSlice';
+import { login, loginFail } from './authSlice';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    gridItem: {
+    container: {
+      height: '100vh'
+    },
+    gridContainer: {
+      height: '100%'
+    },
+    cardHeader: {
       display: 'flex',
       justifyContent: 'center',
     },
+    cardActions: {
+      display: 'flex',
+      justifyContent: 'center',
+      margin: '1rem'
+    }
   })
 );
 
@@ -28,42 +39,25 @@ const Login: React.FC<LoginProps> = ({}) => {
 
   const dispatch = useAppDispatch();
 
-  const responseGoogle = (response: any) => {
-    fetch('http://localhost:5000/auth', {
-      method: 'POST',
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-        'Content-Type': 'application/octet-stream; charset=utf-8',
-      },
-      body: response['code'],
-    })
-      .then(res => res.json())
-      .then(res => {
-        localStorage.setItem('access_token', res.data['access_token']);
-        localStorage.setItem('refresh_token', res.data['refresh_token']);
-        dispatch(login());
-      });
-  };
-
   const { signIn, loaded } = useGoogleLogin({
-    onSuccess: responseGoogle,
+    onSuccess: (response: any) => dispatch(login(response)),
     clientId:
       '866970815825-8eooshnpih6onak81bii9067qvh0s5pd.apps.googleusercontent.com',
-    isSignedIn: true,
+    isSignedIn: false,
     responseType: 'code',
-    onFailure: responseGoogle,
+    onFailure: () => dispatch(loginFail()),
   });
 
   return (
-    <Container>
-      <Grid container>
-        <Grid item xs={12} className={classes.gridItem}>
+    <Container className={classes.container}>
+      <Grid container justify='center' alignItems='center' className={classes.gridContainer}>
+        <Grid item xs={8}>
           <Card>
-            <CardContent>
+            <CardContent className={classes.cardHeader}>
               <h2>Login Page</h2>
             </CardContent>
-            <CardActions>
-              <Button onClick={signIn}>Login</Button>
+            <CardActions className={classes.cardActions}>
+              <Button variant='contained' color='secondary' onClick={signIn}>Login</Button>
             </CardActions>
           </Card>
         </Grid>
