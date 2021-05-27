@@ -36,7 +36,7 @@ export const authSlice = createSlice({
 
 export const authMiddleware: Middleware<any, any, Dispatch<Action>> = store => next => action => {
   if (action.type === 'auth/login') {
-    fetch('http://localhost:5000/auth', {
+    fetch(`${process.env.REACT_APP_API_BASE_URL}/auth`, {
       method: 'POST',
       headers: {
         'X-Requested-With': 'XMLHttpRequest',
