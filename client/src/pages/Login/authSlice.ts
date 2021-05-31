@@ -1,6 +1,8 @@
-import { Action, createSlice, Middleware, Dispatch } from '@reduxjs/toolkit';
+import { createSlice, Action, Middleware, Dispatch } from '@reduxjs/toolkit';
 import { RootState } from '../../app/store';
-
+// import { getUserTodosAsync } from '../../components/todos/todosSlice';
+import { setUser } from '../Profile/profileSlice';
+// import { getPublicTodosAsync, getUserTodosAsync } from '../../components/todos/todosSlice'; TODO: Find type-safe fix
 export interface AuthState {
   loggedIn: boolean;
 }
@@ -35,7 +37,7 @@ export const authSlice = createSlice({
 });
 
 export const authMiddleware: Middleware<any, any, Dispatch<Action>> = store => next => action => {
-  if (action.type === 'auth/login') {
+  if (authSlice.actions.login.match(action)) {
     fetch(`${process.env.REACT_APP_API_BASE_URL}/auth`, {
       method: 'POST',
       headers: {
@@ -48,18 +50,21 @@ export const authMiddleware: Middleware<any, any, Dispatch<Action>> = store => n
       .then(res => {
         localStorage.setItem('access_token', res.data['access_token']);
         localStorage.setItem('refresh_token', res.data['refresh_token']);
+        store.dispatch(setUser(res['data']['user']));
+      }).catch(error => {
+        console.error(error);
       });
-  } else if (action.type === 'auth/loginFail') {
+  } else if (authSlice.actions.loginFail.match(action)) {
     if (localStorage.getItem('access_token')) {
       localStorage.removeItem('access_token')
     }
     if (localStorage.getItem('refresh_token')) {
       localStorage.removeItem('refresh_token')
     }
-  } else if (action.type === 'auth/logout') {
+  } else if (authSlice.actions.logout.match(action)) {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
-  } else if (action.type === 'auth/logoutFail') {
+  } else if (authSlice.actions.logoutFail.match(action)) {
     console.warn('Failed to logout')
   }
   next(action)

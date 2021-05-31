@@ -22,6 +22,9 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { Avatar } from '@material-ui/core';
 import { routes } from './Router/Config';
+import { useAppSelector } from '../app/hooks';
+import { selectUser } from '../pages/Profile/profileSlice';
+import Blob from './Blob';
 
 const drawerWidth = 240;
 
@@ -71,8 +74,14 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     drawerOverride: {
-      backgroundColor: theme.palette.primary.main,
-      color: theme.palette.common.white,
+      // backgroundColor: theme.palette.primary.main,
+      background:
+        'linear-gradient(to bottom right, rgba(255,255,255,0.8), rgba(255,255,255,0.5))',
+      color: theme.palette.common.black,
+      border: 'none',
+      boxShadow:
+        '1px 0px 2px -1px rgb(0 0 0 / 20%), 1px 0px 1px 0px rgb(0 0 0 / 14%), 1px 0px 3px 0px rgb(0 0 0 / 12%)',
+      backdropFilter: 'blur(1rem)',
     },
     drawerOpen: {
       width: drawerWidth,
@@ -103,6 +112,8 @@ const useStyles = makeStyles((theme: Theme) =>
     content: {
       flexGrow: 1,
       padding: theme.spacing(3),
+      zIndex: 1,
+      overflow: 'scroll',
     },
     sidebarControl: {
       position: 'absolute',
@@ -122,12 +133,50 @@ const useStyles = makeStyles((theme: Theme) =>
       height: theme.spacing(4),
       width: theme.spacing(4),
     },
+    background: {
+      minHeight: '100vh',
+      width: '100vw',
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      overflow: 'hidden',
+    },
+    blob1: {
+      fill: 'rgba(156, 38, 176, .4)',
+      position: 'absolute',
+      top: '30vh',
+      right: '-45vw',
+      width: '70vmax',
+      height: '5vmax',
+      zIndex: -2,
+      transform: 'rotate(160deg)',
+    },
+    blob2: {
+      fill: 'rgba(156, 38, 176, .55)',
+      left: '5vw',
+      width: '45vmax',
+      bottom: '-10vh',
+      height: '10vmax',
+      zIndex: -2,
+      position: 'absolute',
+      transform: 'rotate(140deg)',
+    },
+    backdropGlass: {
+      height: '100vh',
+      width: '100vw',
+      zIndex: -1,
+      background:
+        'linear-gradient(to bottom right, rgba(255,255,255,.3), rgba(255,255,255,.1))',
+      backgroundRepeat: 'no-repeat',
+      backdropFilter: 'blur(.5rem)',
+    },
   })
 );
 
 const Layout: React.FC = ({ children }) => {
   const classes = useStyles();
   const theme = useTheme();
+  const user = useAppSelector(selectUser);
   const [open, setOpen] = useState<boolean>(false);
 
   const handleDrawerOpen = () => {
@@ -141,6 +190,11 @@ const Layout: React.FC = ({ children }) => {
   return (
     <div className={classes.root}>
       <CssBaseline />
+      <div className={classes.background}>
+        <Blob className={classes.blob1} />
+        <Blob className={classes.blob2} />
+        <div className={classes.backdropGlass}></div>
+      </div>
       {/* <AppBar
         position="fixed"
         className={clsx(classes.appBar, {
@@ -172,15 +226,36 @@ const Layout: React.FC = ({ children }) => {
       >
         <div className={classes.toolbar}>
           <IconButton component={Link} to="profile">
-            <Avatar className={classes.avatar}>A</Avatar>
+            <Avatar
+              className={classes.avatar}
+              src={
+                localStorage.getItem('profile_picture')
+                  ? (localStorage.getItem('profile_picture') as string)
+                  : user
+                  ? (user.picture as string)
+                  : undefined
+              }
+            >
+              {user && user.name ? user.name[0] : 'A'}
+            </Avatar>
           </IconButton>
         </div>
         <Divider />
         <List>
           {routes.map(route => (
-            <ListItem button component={Link} to={route.path} key={`ListItem_${route.path}`}>
-              <ListItemIcon key={`ListItemIcon_${route.path}`}>{route.icon}</ListItemIcon>
-              <ListItemText primary={route.title} key={`ListItemText_${route.path}`} />
+            <ListItem
+              button
+              component={Link}
+              to={route.path}
+              key={`ListItem_${route.path}`}
+            >
+              <ListItemIcon key={`ListItemIcon_${route.path}`}>
+                {route.icon}
+              </ListItemIcon>
+              <ListItemText
+                primary={route.title}
+                key={`ListItemText_${route.path}`}
+              />
             </ListItem>
           ))}
         </List>
@@ -211,7 +286,7 @@ const Layout: React.FC = ({ children }) => {
         </div>
       </Drawer>
       <main className={classes.content}>
-        <div className={classes.toolbar} />
+        {/* <div className={classes.toolbar} /> */}
         <Container>
           <Outlet />
         </Container>

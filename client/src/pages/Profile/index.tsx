@@ -1,8 +1,8 @@
 import { Button, Grid } from '@material-ui/core';
 import React from 'react';
 import { useGoogleLogout } from 'react-google-login';
-import { useAppDispatch } from '../app/hooks';
-import { logout, logoutFail } from './Login/authSlice';
+import { useAppDispatch } from '../../app/hooks';
+import { logout, logoutFail } from '../Login/authSlice';
 
 interface ProfileProps {}
 

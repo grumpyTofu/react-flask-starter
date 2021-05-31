@@ -1,4 +1,5 @@
 import { Counter } from '../counter/Counter';
+import Todos from '../todos/Todos';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import ListIcon from '@material-ui/icons/List';
 
@@ -19,7 +20,7 @@ export const routes: RouteConfig[] = [
   },
   {
     path: 'todos',
-    component: <div>Todos</div>,
+    component: <Todos />,
     icon: <ListIcon />,
     title: 'Todos',
   },
