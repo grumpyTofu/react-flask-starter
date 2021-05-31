@@ -13,6 +13,7 @@ def init_app():
     """Initialize the core application."""
     app = Flask(__name__, instance_relative_config=False)
     app.config.from_object('config.DevConfig')
+    #app.config.from_object('config.ShortAuthLife')
 
     # OAuth 2 client setup
     app.client = WebApplicationClient(app.config.get('GOOGLE_CLIENT_ID'))

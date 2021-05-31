@@ -1,12 +1,9 @@
-from os import access
-from flask import Blueprint, request, redirect, url_for, jsonify
+from flask import Blueprint, request, jsonify
 from flask import current_app as app
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt, create_refresh_token, unset_jwt_cookies
+from flask_jwt_extended import create_access_token, jwt_required, create_refresh_token, get_jwt
 from app import db
 from app.data.models import User
 from oauth2client import client
-from datetime import datetime, timezone, timedelta
-import json
 
 from app.utils import api_response
 
@@ -35,8 +32,7 @@ def auth():
         gid = credentials.id_token['sub']
         email = credentials.id_token['email']
         name = credentials.id_token['name']
-
-        print(credentials.id_token)
+        picture = credentials.id_token['picture']
         
         user = User.query.filter_by(gid=gid).first()
         if not user:
@@ -46,14 +42,16 @@ def auth():
 
         # Begin user session by logging the user in
         additional_claims = ['id', 'role_id', 'gid']
-        access_token = create_access_token(name, additional_claims=user.serialize(additional_claims), fresh=True)
+        access_token = create_access_token(name, additional_claims=user.serialize(additional_claims))
         refresh_token = create_refresh_token(name, additional_claims=user.serialize(additional_claims))
         return api_response(False, "Authentication successful", {
             'access_token': access_token, 
             'refresh_token': refresh_token,
             'user': {
+                'uid': user.id,
                 'name': user.name,
-                'email': user.email
+                'email': user.email,
+                'picture': picture
             }
         })
     except Exception as error:
@@ -61,12 +59,35 @@ def auth():
 
 # We are using the `refresh=True` options in jwt_required to only allow
 # refresh tokens to access this route.
-@app.route("/refresh", methods=["POST"])
+@app.route("/refresh")
 @jwt_required(refresh=True)
 def refresh():
-    identity = get_jwt_identity()
-    access_token = create_access_token(identity=identity, fresh=False)
-    return jsonify(access_token=access_token)
+    try:
+        claims = get_jwt()
+
+        if claims['fresh'] == False:
+            raise Exception('UNAUTHORIZED')
+
+        user = User.query.get(claims['id'])
+
+        additional_claims = ['id', 'role_id', 'gid']
+        access_token = create_access_token(user.name, additional_claims=user.serialize(additional_claims))
+        refresh_token = create_refresh_token(user.name, additional_claims=user.serialize(additional_claims))
+        return api_response(False, "Authentication refresh successful", {
+                'access_token': access_token, 
+                'refresh_token': refresh_token,
+                'user': {
+                    'uid': user.id,
+                    'name': user.name,
+                    'email': user.email
+                }
+            })
+    except Exception as error:
+        message, = error.args
+        if message == 'UNAUTHORIZED':
+            return api_response(True, message)
+        else :
+            return api_response(True, "Failed to refresh authentication", str(error))
 
 # # Using an `after_request` callback, we refresh any token
 # @app.after_request

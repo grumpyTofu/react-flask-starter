@@ -5,7 +5,6 @@ from dotenv import load_dotenv
 basedir = path.abspath(path.dirname(__file__))
 load_dotenv(path.join(basedir, '.env'))
 
-
 class Config:
     """Base config."""
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -17,14 +16,12 @@ class Config:
     )
     SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly'],
     SECRET_KEY = '67681706705814926988217450263467825103115742778348395787050591504601043143932'
-    JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(hours=1)
-
 class ProdConfig(Config):
     FLASK_ENV = 'production'
     DEBUG = False
     TESTING = False
     SQLALCHEMY_DATABASE_URI = environ.get('PROD_DATABASE_URI')
-
+    JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(hours=1)
 
 class DevConfig(Config):
     FLASK_ENV = 'development'
@@ -32,3 +29,8 @@ class DevConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = environ.get('DEV_DATABASE_URI')
     OAUTHLIB_INSECURE_TRANSPORT = '1'
+    JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(hours=1)
+
+class ShortAuthLife(DevConfig):
+    JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(minutes=1)
+    JWT_REFRESH_TOKEN_EXPIRES = datetime.timedelta(minutes=2)

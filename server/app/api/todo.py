@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request
 from flask import current_app as app
+from flask_jwt_extended import jwt_required, get_jwt 
 from app import db
 from app.data.models import Todo
 from app.utils import api_response, get_fields
@@ -9,9 +10,12 @@ import json
 todo_bp = Blueprint('todo', __name__)
 
 @todo_bp.route('/getTodos')
+@jwt_required(optional=True)
 def getTodos():
     try:
         fields = get_fields(request)
+        print(fields)
+        # claims = get_jwt()
         uid = request.args['uid'] if len(request.args) > 0 and 'uid' in request.args else None
         todos = Todo.query.filter_by(uid=uid).all()
         return api_response(False, 'Todos successfully retrieved', [todo.serialize(fields) for todo in todos])
@@ -20,6 +24,7 @@ def getTodos():
 
 
 @todo_bp.route('/createTodo', methods=['POST'])
+@jwt_required(optional=True)
 def createTodo():
     try:
         fields = get_fields(request, request.method)

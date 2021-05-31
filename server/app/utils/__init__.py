@@ -25,7 +25,7 @@ def get_fields(request, method='GET'):
         return fields
     elif method == 'GET' and 'fields' in request.args:
         fields = request.args.get('fields').split(',')
-    else:
+    elif method != 'GET':
         body = request.get_json()
         if 'fields' in body.keys():
             fields = body['fields']
