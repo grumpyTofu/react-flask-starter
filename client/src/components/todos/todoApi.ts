@@ -25,3 +25,11 @@ export function updateTodo(id: number, patchTodo: Partial<Todo>) {
     })
   })
 }
+
+export function deleteTodos(ids: number[]) {
+  return new Promise<ApiResponse<number[]>>((resolve) => {
+    apiFetch('deleteTodos', 'DELETE', { ids: ids }).then((res: ApiResponse<number[]>) => {
+      resolve(res);
+    })
+  })
+}

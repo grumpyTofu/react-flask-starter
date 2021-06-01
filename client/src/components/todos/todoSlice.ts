@@ -11,7 +11,7 @@ import {
 import { RootState } from '../../app/store';
 import { logout } from '../../pages/Login/authSlice';
 import { ApiResponse, unauthorized } from '../../utils/apiFetch';
-import { fetchTodos, createTodo, updateTodo } from './todoApi';
+import { fetchTodos, createTodo, updateTodo, deleteTodos } from './todoApi';
 
 export interface Todo {
     id: number;
@@ -56,6 +56,14 @@ export const updateTodoAsync = createAsyncThunk(
     }
 )
 
+export const deleteTodosAsync = createAsyncThunk(
+    'todos/deleteTodosAsync',
+    async (ids: number[]) => {
+        const response = await deleteTodos(ids);
+        return response;
+    }
+)
+
 export const todoSlice = createSlice({
     name: 'todos',
     initialState: todosAdapter.getInitialState(),
@@ -71,7 +79,10 @@ export const todoSlice = createSlice({
             .addCase(updateTodoAsync.fulfilled, (state, action: PayloadAction<ApiResponse<Todo>>) => {
                 const { id, ...updatedTodo } = action.payload.data;
                 todosAdapter.updateOne(state, { id: id, changes: updatedTodo });
-            });;
+            })
+            .addCase(deleteTodosAsync.fulfilled, (state, action: PayloadAction<ApiResponse<number[]>>) => {
+                todosAdapter.removeMany(state, action.payload.data);
+            });
     },
 });
 

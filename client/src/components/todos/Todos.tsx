@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { RootState, store } from '../../app/store';
-import { todosSelector, getTodosAsync } from './todoSlice';
+import { todosSelector, getTodosAsync, deleteTodosAsync } from './todoSlice';
 import {
   Grid,
   Card,
@@ -108,13 +108,14 @@ const Todos: React.FC<TodosProps> = ({}) => {
             {todoState.todos.length > 0 && (
               <Button
                 variant="contained"
-                onClick={() =>
+                onClick={() => {
+                  dispatch(deleteTodosAsync(todoState.todos));
                   setTodoState({
                     ...todoState,
                     select: false,
                     todos: []
                   })
-                }
+                }}
               >
                 Delete
               </Button>
@@ -150,7 +151,7 @@ const Todos: React.FC<TodosProps> = ({}) => {
               onClick={() =>
                 setTodoState({
                   ...todoState,
-                  open: false,
+                  open: true,
                   edit: false,
                 })
               }
