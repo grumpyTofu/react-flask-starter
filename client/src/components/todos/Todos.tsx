@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { RootState, store } from '../../app/store';
-import { todosSelector, getTodosAsync, Todo } from './todoSlice';
+import { todosSelector, getTodosAsync } from './todoSlice';
 import {
   Grid,
   Card,
@@ -16,7 +16,7 @@ import {
 import { useSelector } from 'react-redux';
 import TodoCard from './TodoCard';
 import FilterListIcon from '@material-ui/icons/FilterList';
-import CreateTodo from './createTodo';
+import TodoDialog from './TodoDialog';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -52,6 +52,13 @@ const useStyles = makeStyles((theme: Theme) =>
 
 interface TodosProps {}
 
+export interface TodoState {
+  open: boolean;
+  edit: boolean;
+  select: boolean;
+  todos: number[];
+}
+
 const Todos: React.FC<TodosProps> = ({}) => {
   const classes = useStyles();
 
@@ -68,7 +75,12 @@ const Todos: React.FC<TodosProps> = ({}) => {
     }
   }, []);
 
-  const [createDialogOpen, setCreateDialogOpen] = useState<boolean>(false);
+  const [todoState, setTodoState] = useState<TodoState>({
+    open: false,
+    edit: false,
+    select: false,
+    todos: [],
+  });
 
   return (
     <Grid container spacing={2}>
@@ -79,14 +91,71 @@ const Todos: React.FC<TodosProps> = ({}) => {
           </CardContent>
           <div className={classes.spacer} />
           <CardActions className={classes.menuActions}>
-            <Button variant="contained" startIcon={<FilterListIcon />}>
-              Filter
-            </Button>
+            {todoState.todos.length === 1 && (
+              <Button
+                variant="contained"
+                onClick={() =>
+                  setTodoState({
+                    ...todoState,
+                    open: true,
+                    edit: true,
+                  })
+                }
+              >
+                Edit
+              </Button>
+            )}
+            {todoState.todos.length > 0 && (
+              <Button
+                variant="contained"
+                onClick={() =>
+                  setTodoState({
+                    ...todoState,
+                    select: false,
+                    todos: []
+                  })
+                }
+              >
+                Delete
+              </Button>
+            )}
+            {todoState.select ? (
+              <Button
+                variant="contained"
+                onClick={() =>
+                  setTodoState({
+                    ...todoState,
+                    select: false,
+                    todos: [],
+                  })
+                }
+              >
+                Cancel
+              </Button>
+            ) : (
+              <Button
+                variant="contained"
+                onClick={() =>
+                  setTodoState({
+                    ...todoState,
+                    select: true,
+                  })
+                }
+              >
+                Select
+              </Button>
+            )}
             <Button
               variant="contained"
-              onClick={() => setCreateDialogOpen(true)}
+              onClick={() =>
+                setTodoState({
+                  ...todoState,
+                  open: false,
+                  edit: false,
+                })
+              }
             >
-              Create Todo
+              Create
             </Button>
           </CardActions>
         </Card>
@@ -94,13 +163,23 @@ const Todos: React.FC<TodosProps> = ({}) => {
       {todos && todos.length > 0 && (
         <>
           {todos.map(todo => (
-            <TodoCard todo={todo} key={`TodoCard_${todo.id}`} />
+            <TodoCard
+              todo={todo}
+              state={todoState}
+              setState={setTodoState}
+              key={`TodoCard_${todo.id}`}
+            />
           ))}
         </>
       )}
-      <CreateTodo
-        open={createDialogOpen}
-        handleClose={() => setCreateDialogOpen(false)}
+      <TodoDialog
+        state={todoState}
+        handleClose={() => setTodoState({ ...todoState, open: false, edit: false })}
+        todo={
+          todoState.todos.length === 1
+            ? todosSelector.selectById(store.getState(), todoState.todos[0])
+            : undefined
+        }
       />
     </Grid>
   );

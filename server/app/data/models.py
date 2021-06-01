@@ -27,7 +27,7 @@ class Todo(db.Model, SerializerMixin):
         self.uid = uid
 
     def __repr__(self):
-        return '<User {}>'.format(self.id)
+        return '<Todo {}>'.format(self.id)
 
 class User(db.Model, SerializerMixin):
 

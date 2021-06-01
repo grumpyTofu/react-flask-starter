@@ -48,7 +48,7 @@ def auth():
             'access_token': access_token, 
             'refresh_token': refresh_token,
             'user': {
-                'uid': user.id,
+                'id': user.id,
                 'name': user.name,
                 'email': user.email,
                 'picture': picture
@@ -77,7 +77,7 @@ def refresh():
                 'access_token': access_token, 
                 'refresh_token': refresh_token,
                 'user': {
-                    'uid': user.id,
+                    'id': user.id,
                     'name': user.name,
                     'email': user.email
                 }

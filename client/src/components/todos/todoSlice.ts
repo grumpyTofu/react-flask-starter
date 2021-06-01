@@ -1,8 +1,17 @@
-import { createSlice, createAsyncThunk, createEntityAdapter, PayloadAction, Action, Dispatch, Middleware } from '@reduxjs/toolkit';
+import {
+    createSlice,
+    createAsyncThunk,
+    createEntityAdapter,
+    PayloadAction,
+    Action,
+    Dispatch,
+    Middleware,
+    isFulfilled
+} from '@reduxjs/toolkit';
 import { RootState } from '../../app/store';
 import { logout } from '../../pages/Login/authSlice';
 import { ApiResponse, unauthorized } from '../../utils/apiFetch';
-import { fetchTodos } from './todoApi';
+import { fetchTodos, createTodo, updateTodo } from './todoApi';
 
 export interface Todo {
     id: number;
@@ -16,15 +25,36 @@ const todosAdapter = createEntityAdapter<Todo>({
     selectId: (todo) => todo.id,
     sortComparer: (a, b) => a.id - b.id
 });
-  
+
 export const getTodosAsync = createAsyncThunk(
     'todos/getTodos',
     async (uid: number | null) => {
-      const response = await fetchTodos(uid);
-      // The value we return becomes the `fulfilled` action payload
-      return response;
+        const response = await fetchTodos(uid);
+        // The value we return becomes the `fulfilled` action payload
+        return response;
     }
-  );
+);
+
+interface CreateTodoInput {
+    title: string;
+    description: string;
+}
+
+export const createTodoAsync = createAsyncThunk(
+    'todos/createTodo',
+    async ({ title, description }: CreateTodoInput) => {
+        const response = await createTodo(title, description);
+        return response;
+    }
+)
+
+export const updateTodoAsync = createAsyncThunk(
+    'todos/updateTodoAsync',
+    async ({ id, ...patchTodo }: Partial<Todo>) => {
+        const response = await updateTodo(id as number, patchTodo);
+        return response;
+    }
+)
 
 export const todoSlice = createSlice({
     name: 'todos',
@@ -34,12 +64,20 @@ export const todoSlice = createSlice({
         builder
             .addCase(getTodosAsync.fulfilled, (state, action: PayloadAction<ApiResponse<Todo[]>>) => {
                 todosAdapter.setAll(state, action.payload.data);
-            });
+            })
+            .addCase(createTodoAsync.fulfilled, (state, action: PayloadAction<ApiResponse<Todo>>) => {
+                todosAdapter.addOne(state, action.payload.data);
+            })
+            .addCase(updateTodoAsync.fulfilled, (state, action: PayloadAction<ApiResponse<Todo>>) => {
+                const { id, ...updatedTodo } = action.payload.data;
+                todosAdapter.updateOne(state, { id: id, changes: updatedTodo });
+            });;
     },
 });
 
 export const todoMiddleware: Middleware<any, any, Dispatch<Action>> = store => next => action => {
-    if(getTodosAsync.fulfilled.match(action)) {
+    console.log(isFulfilled(action))
+    if (getTodosAsync.fulfilled.match(action)) {
         if (action.payload.message === unauthorized) {
             store.dispatch(logout());
         }

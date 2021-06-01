@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template, request
 from flask import current_app as app
-from flask_jwt_extended import jwt_required, get_jwt 
+from flask_jwt_extended import jwt_required, get_jwt
+from flask_sqlalchemy import SQLAlchemy
+import sqlalchemy
 from app import db
 from app.data.models import Todo
 from app.utils import api_response, get_fields
@@ -14,10 +16,9 @@ todo_bp = Blueprint('todo', __name__)
 def getTodos():
     try:
         fields = get_fields(request)
-        print(fields)
-        # claims = get_jwt()
-        uid = request.args['uid'] if len(request.args) > 0 and 'uid' in request.args else None
-        todos = Todo.query.filter_by(uid=uid).all()
+        claims = get_jwt()
+        user_id = claims['id']
+        todos = Todo.query.filter((Todo.uid == None) | (Todo.uid == user_id)).all() if user_id else Todo.query.filter_by(uid=None).all()
         return api_response(False, 'Todos successfully retrieved', [todo.serialize(fields) for todo in todos])
     except Exception as error:
         return api_response(True, 'Failed to get todos', str(error))
@@ -27,7 +28,9 @@ def getTodos():
 @jwt_required(optional=True)
 def createTodo():
     try:
+        claims = get_jwt()
         fields = get_fields(request, request.method)
+
         body = request.get_json()
 
         if 'title' not in body.keys():
@@ -37,10 +40,14 @@ def createTodo():
         if 'description' not in body.keys():
             raise Exception('Required properties not specified')
         description = body['description']
-
-        uid = body['uid'] if 'uid' in body.keys() else None
         
-        todo = Todo(title, description, uid)
+        user_id = claims['id'] if 'id' in claims.keys() else None
+
+        print(title)
+        print(description)
+        print(user_id)
+
+        todo = Todo(title, description, user_id)
         db.session.add(todo)
         db.session.commit()
 
@@ -49,14 +56,22 @@ def createTodo():
         return api_response(True, 'Failed to create todo', str(error))
 
 @todo_bp.route('/updateTodo/<int:id>', methods=['PATCH'])
+@jwt_required(optional=True)
 def updateTodo(id: int):
     try:
+        claims = get_jwt()
         fields = get_fields(request, request.method)
         todo = Todo.query.get(id)
         if not todo:
             raise Exception('Object does not exist')
 
+        user_id = claims['id'] if 'id' in claims.keys() else None
+
+        if todo.uid and todo.uid != user_id:
+            raise Exception('Insufficient permissions')
+
         body = request.get_json()
+
         if len(body.keys()) == 0:
             raise Exception('Update data not provided')
 
@@ -66,8 +81,8 @@ def updateTodo(id: int):
         if 'description' in body.keys() and getattr(todo, 'description') != body['description']:
             setattr(todo, 'description', body['description'])
 
-        if 'uid' in body.keys() and getattr(todo, 'uid') != body['uid']:
-            setattr(todo, 'uid', body['uid'])
+        # if 'uid' in body.keys() and getattr(todo, 'uid') != body['uid']:
+        #     setattr(todo, 'uid', body['uid'])
         
         db.session.commit()
         

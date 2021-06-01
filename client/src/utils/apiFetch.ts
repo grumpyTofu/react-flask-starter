@@ -18,11 +18,6 @@ interface AuthApiResponseData {
   }
 }
 
-export const clearUser = () => {
-  localStorage.removeItem('access_token');
-  localStorage.removeItem('refresh_token');
-}
-
 export const apiFetch = (endpoint: string, method: requestMethod = "GET", body: any = {}): Promise<ApiResponse> => new Promise(async (resolve) => {
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
   const jwt = localStorage.getItem('access_token');
