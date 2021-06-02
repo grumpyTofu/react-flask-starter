@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
-import { RootState, store } from '../../app/store';
+import { store } from '../../app/store';
 import { todosSelector, getTodosAsync, deleteTodosAsync } from './todoSlice';
 import {
   Grid,
@@ -13,7 +13,6 @@ import {
   makeStyles,
   Theme,
 } from '@material-ui/core';
-import { useSelector } from 'react-redux';
 import TodoCard from './TodoCard';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import TodoDialog from './TodoDialog';
@@ -65,9 +64,6 @@ const Todos: React.FC<TodosProps> = ({}) => {
   const dispatch = useAppDispatch();
 
   const todos = todosSelector.selectAll(store.getState());
-  // const {
-  //   profile: { user },
-  // } = useSelector((state: RootState) => state);
 
   const {
     profile: { user },
