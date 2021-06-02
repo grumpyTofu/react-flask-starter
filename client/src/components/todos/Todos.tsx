@@ -65,9 +65,13 @@ const Todos: React.FC<TodosProps> = ({}) => {
   const dispatch = useAppDispatch();
 
   const todos = todosSelector.selectAll(store.getState());
+  // const {
+  //   profile: { user },
+  // } = useSelector((state: RootState) => state);
+
   const {
     profile: { user },
-  } = useSelector((state: RootState) => state);
+  } = useAppSelector(state => state);
 
   useEffect(() => {
     if (todos && todos.length === 0) {
@@ -113,8 +117,8 @@ const Todos: React.FC<TodosProps> = ({}) => {
                   setTodoState({
                     ...todoState,
                     select: false,
-                    todos: []
-                  })
+                    todos: [],
+                  });
                 }}
               >
                 Delete
