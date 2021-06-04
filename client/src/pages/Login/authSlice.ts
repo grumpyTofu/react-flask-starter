@@ -1,5 +1,6 @@
 import { createSlice, Action, Middleware, Dispatch } from '@reduxjs/toolkit';
 import { RootState } from '../../app/store';
+import { ApiResponse } from '../../utils/apiFetch';
 // import { getUserTodosAsync } from '../../components/todos/todosSlice';
 import { setUser } from '../Profile/profileSlice';
 // import { getPublicTodosAsync, getUserTodosAsync } from '../../components/todos/todosSlice'; TODO: Find type-safe fix
@@ -47,10 +48,14 @@ export const authMiddleware: Middleware<any, any, Dispatch<Action>> = store => n
       body: action.payload.code,
     })
       .then(res => res.json())
-      .then(res => {
-        localStorage.setItem('access_token', res.data['access_token']);
-        localStorage.setItem('refresh_token', res.data['refresh_token']);
-        store.dispatch(setUser(res['data']['user']));
+      .then((res: ApiResponse) => {
+        if (res.error) {
+          store.dispatch(loginFail());
+        } else {
+          localStorage.setItem('access_token', res.data['access_token']);
+          localStorage.setItem('refresh_token', res.data['refresh_token']);
+          store.dispatch(setUser(res['data']['user']));
+        }
       }).catch(error => {
         console.error(error);
       });
@@ -64,6 +69,7 @@ export const authMiddleware: Middleware<any, any, Dispatch<Action>> = store => n
   } else if (authSlice.actions.logout.match(action)) {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
+    localStorage.removeItem('profile_picture');
   } else if (authSlice.actions.logoutFail.match(action)) {
     console.warn('Failed to logout')
   }

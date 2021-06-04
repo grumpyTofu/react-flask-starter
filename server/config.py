@@ -15,7 +15,7 @@ class Config:
         "https://accounts.google.com/.well-known/openid-configuration"
     )
     SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly'],
-    SECRET_KEY = '67681706705814926988217450263467825103115742778348395787050591504601043143932'
+    SECRET_KEY = environ.get("SECRET_KEY")
 class ProdConfig(Config):
     FLASK_ENV = 'production'
     DEBUG = False

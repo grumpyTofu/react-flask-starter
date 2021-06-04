@@ -110,8 +110,7 @@ const Login: React.FC<LoginProps> = ({}) => {
 
   const { signIn, loaded } = useGoogleLogin({
     onSuccess: (response: any) => dispatch(login(response)),
-    clientId:
-      '866970815825-8eooshnpih6onak81bii9067qvh0s5pd.apps.googleusercontent.com',
+    clientId: process.env.REACT_APP_GOOGLE_CLIENT_ID as string,
     isSignedIn: false,
     responseType: 'code',
     onFailure: () => dispatch(loginFail()),
